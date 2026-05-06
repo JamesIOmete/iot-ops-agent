@@ -1,0 +1,8 @@
+{
+  "status": "created",
+  "issue_number": 47,
+  "issue_url": "https://github.com/owner/iot-ops-incidents/issues/47",
+  "title": "placeholder",
+  "labels": ["iot-incident", "cold-chain"],
+  "data_source": "mock"
+}

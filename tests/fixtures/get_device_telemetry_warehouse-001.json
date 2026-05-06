@@ -1,0 +1,15 @@
+{
+  "device_id": "warehouse-001",
+  "timestamp": "2026-05-06T14:29:30Z",
+  "temperature_c": -18.1,
+  "humidity_percent": 38.5,
+  "battery_percent": null,
+  "power_source": "mains",
+  "door_status": "closed",
+  "compressor_status": "running",
+  "zone": "A1",
+  "connectivity_status": "connected",
+  "rssi_dbm": -52,
+  "last_heartbeat": "2026-05-06T14:29:30Z",
+  "data_source": "mock"
+}

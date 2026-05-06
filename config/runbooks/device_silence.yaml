@@ -1,0 +1,76 @@
+id: device_silence
+name: Device Silence Investigation
+description: >
+  Executed when the ColdChain-DeviceSilence alarm fires, indicating a device
+  has not reported a heartbeat for more than 30 minutes. Goal is to determine
+  whether the device is genuinely offline, experiencing connectivity issues,
+  or if there is a DLQ backlog hiding the silence from operations.
+trigger_alarm: ColdChain-DeviceSilence
+estimated_duration_minutes: 8
+
+steps:
+  - id: identify_silent_devices
+    name: Identify silent devices
+    description: >
+      List all fleet devices and check telemetry for each. Identify devices
+      whose last_heartbeat is older than the silence threshold (30 minutes).
+      Note the duration of silence and last known location/state.
+    tools:
+      - list_fleet_devices
+      - get_device_telemetry
+    hypothesis: One or more devices have not reported within the silence threshold.
+    confidence_adjustments:
+      silent_device_found: +0.35
+      all_devices_reporting: -0.40
+
+  - id: check_device_shadow
+    name: Check IoT device shadow for last known state
+    description: >
+      Retrieve the AWS IoT Device Shadow for silent devices. The shadow records
+      the last reported state even if the device is now offline. Check connectivity
+      metadata and the timestamp of the last shadow update to determine how long
+      the device has truly been offline.
+    tools:
+      - get_device_shadow
+    hypothesis: Shadow metadata confirms the device last reported > 30 minutes ago.
+    confidence_adjustments:
+      shadow_confirms_silence: +0.25
+      shadow_shows_recent_update: -0.30
+
+  - id: check_dlq_for_backlog
+    name: Check DLQ for telemetry delivery failures
+    description: >
+      Check the DLQ depth. A high DLQ count suggests devices are sending
+      telemetry but the IoT rules pipeline is failing to process it. This would
+      produce a false silence alarm — the device is online but messages are stuck.
+    tools:
+      - get_dlq_depth
+    hypothesis: Low DLQ depth confirms the pipeline is healthy; silence is genuine.
+    confidence_adjustments:
+      dlq_empty: +0.20
+      dlq_elevated: -0.25
+
+  - id: check_device_logs
+    name: Check recent device logs
+    description: >
+      Query CloudWatch Logs for the last entries from the silent device.
+      Recent log entries (within 30 minutes) would indicate connectivity to
+      CloudWatch but not to IoT Core — possibly an MQTT credential issue.
+      Absence of any recent logs confirms complete connectivity loss.
+    tools:
+      - query_cloudwatch_logs
+    hypothesis: Absence of recent logs confirms the device has lost all connectivity.
+    confidence_adjustments:
+      no_recent_logs: +0.20
+      recent_logs_present: -0.15
+
+escalation_triggers:
+  - condition: confidence_below_threshold
+    action: publish_sns_escalation
+    description: Cannot determine root cause of silence — escalate to on-call.
+  - condition: never_auto_remediate_match
+    action: publish_sns_escalation
+    description: Recommended remediation is in the blocked list — escalate to on-call.
+  - condition: silence_confirmed
+    action: create_github_issue
+    description: Create tracking issue for confirmed device silence.

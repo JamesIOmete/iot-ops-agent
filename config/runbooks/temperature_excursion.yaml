@@ -1,0 +1,87 @@
+id: temperature_excursion
+name: Temperature Excursion Response
+description: >
+  Executed when the ColdChain-TemperatureHigh alarm fires. Goal is to determine
+  whether this is a real cold chain failure or a sensor/connectivity artifact,
+  identify affected devices, assess severity, and remediate or escalate.
+trigger_alarm: ColdChain-TemperatureHigh
+estimated_duration_minutes: 10
+
+steps:
+  - id: identify_affected_devices
+    name: Identify affected devices
+    description: >
+      List all fleet devices and retrieve telemetry for each. Identify which
+      devices are reporting temperatures outside the configured excursion thresholds.
+      Note: frozen storage threshold is -22.0°C to -15.0°C. Above -12.0°C is alarm territory.
+    tools:
+      - list_fleet_devices
+      - get_device_telemetry
+    hypothesis: One or more devices are reporting temperatures above the excursion threshold.
+    confidence_adjustments:
+      excursion_found: +0.35
+      no_excursion_found: -0.25
+
+  - id: check_excursion_history
+    name: Check excursion event history
+    description: >
+      For each device with abnormal temperature, query excursion events over the last
+      24 hours. Determine whether this is a sustained excursion (> 15 minutes) or an
+      isolated spike. Sustained excursions indicate a real cold chain failure.
+    tools:
+      - get_excursion_events
+    hypothesis: A sustained excursion (multiple events over 15+ minutes) confirms real failure.
+    confidence_adjustments:
+      sustained_excursion: +0.25
+      isolated_spike: -0.15
+
+  - id: verify_alarm_state
+    name: Verify CloudWatch alarm is still active
+    description: >
+      Confirm the ColdChain-TemperatureHigh alarm remains in ALARM state. If it has
+      returned to OK, the condition may have self-resolved. If ALARM, the issue persists.
+    tools:
+      - get_cloudwatch_alarm_state
+    hypothesis: Alarm still in ALARM state confirms the condition has not self-resolved.
+    confidence_adjustments:
+      still_in_alarm: +0.15
+      returned_to_ok: -0.35
+
+  - id: check_device_shadow
+    name: Check IoT device shadow
+    description: >
+      Retrieve the AWS IoT Device Shadow for affected devices. Compare reported vs
+      desired state. If the device is connected and reporting the high temperature,
+      the excursion is confirmed real. If the device appears disconnected in shadow,
+      this may be a telemetry replay or stale data artifact.
+    tools:
+      - get_device_shadow
+    hypothesis: Device shadow confirms device is connected and actively reporting the excursion.
+    confidence_adjustments:
+      shadow_confirms_connected: +0.15
+      shadow_shows_disconnected: -0.20
+
+  - id: check_device_logs
+    name: Check device logs for sensor errors
+    description: >
+      Query CloudWatch Logs for ERROR-level entries from the affected device.
+      Sensor malfunctions (I2C errors, ADC faults) would appear here. Absence
+      of errors increases confidence this is a real temperature rise, not a
+      faulty sensor reading.
+    tools:
+      - query_cloudwatch_logs
+    hypothesis: Absence of sensor errors confirms this is a genuine temperature excursion.
+    confidence_adjustments:
+      no_sensor_errors: +0.10
+      sensor_errors_found: -0.30
+
+escalation_triggers:
+  - condition: confidence_below_threshold
+    action: publish_sns_escalation
+    description: Insufficient evidence to determine root cause — escalate to on-call.
+  - condition: never_auto_remediate_match
+    action: publish_sns_escalation
+    description: Recommended remediation is in the blocked list — escalate to on-call.
+  - condition: sustained_excursion_confirmed
+    action: create_github_issue
+    description: Create tracking issue for confirmed sustained excursion.

@@ -1,0 +1,150 @@
+runtime:
+  mock_mode: true
+  log_dir: logs
+  log_level: INFO
+  mode: null  # set at runtime by run.py
+  allow_write_actions: false  # set at runtime by run.py
+
+model:
+  id: claude-sonnet-4-6
+  max_tokens: 4096
+
+aws:
+  region: us-east-1
+  dynamodb:
+    telemetry_table: iot-cold-chain-telemetry
+    devices_table: iot-cold-chain-devices
+    excursions_table: iot-cold-chain-excursions
+  cloudwatch:
+    alarms:
+      temperature_high: ColdChain-TemperatureHigh
+      device_silence: ColdChain-DeviceSilence
+      dlq_depth: ColdChain-DLQDepth
+    log_groups:
+      device_logs: /aws/iot/cold-chain/devices
+      agent_logs: /aws/iot/cold-chain/agent
+  sqs:
+    dlq_name: iot-cold-chain-dlq
+  sns:
+    escalation_topic_arn: arn:aws:sns:us-east-1:123456789012:iot-cold-chain-escalations
+  iot:
+    endpoint: abc123xyz.iot.us-east-1.amazonaws.com
+
+fleet:
+  device_ids:
+    - truck-001
+    - truck-002
+    - truck-003
+    - warehouse-001
+    - warehouse-002
+
+thresholds:
+  temperature:
+    frozen_min_c: -22.0
+    frozen_max_c: -15.0
+    refrigerated_min_c: 2.0
+    refrigerated_max_c: 8.0
+    # Alarm fires when frozen storage exceeds this (sensor above normal range)
+    excursion_high_frozen_c: -12.0
+    excursion_low_frozen_c: -25.0
+  battery:
+    low_percent: 20
+    critical_percent: 10
+  connectivity:
+    silence_threshold_minutes: 30
+    max_missed_heartbeats: 3
+  dlq:
+    depth_warning: 10
+    depth_critical: 50
+
+escalation:
+  confidence_threshold: 0.75
+  never_auto_remediate:
+    - firmware update
+    - factory reset
+    - delete device
+    - remove device
+    - disable device
+    - clear all
+    - wipe
+
+tool_permissions:
+  watchdog:
+    allowed_tools:
+      - get_device_telemetry
+      - list_fleet_devices
+      - get_excursion_events
+      - get_cloudwatch_alarm_state
+      - query_cloudwatch_logs
+      - get_dlq_depth
+    allow_write_actions: false
+  incident:
+    allowed_tools:
+      - get_device_telemetry
+      - list_fleet_devices
+      - get_excursion_events
+      - get_cloudwatch_alarm_state
+      - query_cloudwatch_logs
+      - get_dlq_depth
+      - get_device_shadow
+      - create_github_issue
+      - publish_sns_escalation
+    allow_write_actions: true
+  briefing:
+    allowed_tools:
+      - get_device_telemetry
+      - list_fleet_devices
+      - get_excursion_events
+      - get_cloudwatch_alarm_state
+      - get_dlq_depth
+    allow_write_actions: false
+
+modes:
+  watchdog:
+    max_tool_calls: 30
+    output:
+      format_style: plain  # "plain" (text status labels, no emojis) or "emoji"
+    system_prompt: |
+      You are an autonomous IoT fleet health monitor for a cold chain logistics operation.
+      Your job is to check every device in the fleet, identify anomalies, and produce a
+      structured health report. You operate with read-only tools.
+
+      For each device: check telemetry, check excursion history, check alarms, check DLQ depth.
+      Flag temperature excursions, device silences, battery warnings, and elevated DLQ depth.
+      If you identify a condition requiring human intervention, note it clearly — you cannot
+      remediate in this mode.
+
+      Produce a final structured report: overall fleet status, devices requiring attention,
+      anomalies detected, and recommended next steps.
+
+  incident:
+    max_tool_calls: 50
+    system_prompt: |
+      You are an IoT incident responder for a cold chain logistics operation.
+      You have been triggered by an alarm. You will be given a runbook — follow its steps
+      methodically. Gather evidence, form a hypothesis, assess confidence, and either
+      remediate (if safe and permitted) or escalate with full context.
+
+      Write tools (create_github_issue, publish_sns_escalation) require explicit permission.
+      If your recommended action matches a blocked category, escalate instead.
+
+      Document your reasoning at each step. State your confidence level explicitly before
+      taking any action.
+
+  briefing:
+    max_tool_calls: 20
+    output:
+      format_style: plain  # "plain" (text status labels, no emojis) or "emoji"
+    system_prompt: |
+      You are an IoT fleet operations analyst. Produce a concise, structured briefing on
+      current fleet status. Your audience is an on-call engineer who needs to understand
+      fleet health in under two minutes.
+
+      Highlight devices needing immediate attention at the top. Summarize normal devices
+      briefly. End with a prioritized action list.
+
+github:
+  repo: owner/iot-ops-incidents
+  default_labels:
+    - iot-incident
+    - cold-chain

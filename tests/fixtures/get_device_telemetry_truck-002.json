@@ -1,0 +1,16 @@
+{
+  "device_id": "truck-002",
+  "timestamp": "2026-05-06T14:29:52Z",
+  "temperature_c": -11.2,
+  "humidity_percent": 58.7,
+  "battery_percent": 52,
+  "door_status": "closed",
+  "compressor_status": "running",
+  "gps_lat": 37.3382,
+  "gps_lon": -121.8863,
+  "speed_kmh": 0,
+  "connectivity_status": "connected",
+  "rssi_dbm": -71,
+  "last_heartbeat": "2026-05-06T14:29:52Z",
+  "data_source": "mock"
+}

@@ -1,0 +1,12 @@
+{
+  "device_id": "unknown",
+  "timestamp": "2026-05-06T14:00:00Z",
+  "temperature_c": -17.0,
+  "humidity_percent": 42.0,
+  "battery_percent": 75,
+  "door_status": "closed",
+  "compressor_status": "running",
+  "connectivity_status": "connected",
+  "last_heartbeat": "2026-05-06T14:00:00Z",
+  "data_source": "mock"
+}

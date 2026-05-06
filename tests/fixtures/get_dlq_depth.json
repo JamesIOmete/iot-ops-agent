@@ -1,0 +1,6 @@
+{
+  "queue_name": "iot-cold-chain-dlq",
+  "depth": 0,
+  "in_flight": 0,
+  "data_source": "mock"
+}

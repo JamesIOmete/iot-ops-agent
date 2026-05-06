@@ -1,0 +1,51 @@
+{
+  "devices": [
+    {
+      "device_id": "truck-001",
+      "device_type": "refrigerated_truck",
+      "cargo_type": "frozen",
+      "status": "connected",
+      "firmware_version": "2.4.1",
+      "last_heartbeat": "2026-05-06T14:29:45Z",
+      "region": "us-west"
+    },
+    {
+      "device_id": "truck-002",
+      "device_type": "refrigerated_truck",
+      "cargo_type": "frozen",
+      "status": "connected",
+      "firmware_version": "2.4.1",
+      "last_heartbeat": "2026-05-06T14:29:52Z",
+      "region": "us-west"
+    },
+    {
+      "device_id": "truck-003",
+      "device_type": "refrigerated_truck",
+      "cargo_type": "frozen",
+      "status": "disconnected",
+      "firmware_version": "2.3.8",
+      "last_heartbeat": "2026-05-06T13:42:17Z",
+      "region": "us-central"
+    },
+    {
+      "device_id": "warehouse-001",
+      "device_type": "cold_storage_sensor",
+      "cargo_type": "frozen",
+      "status": "connected",
+      "firmware_version": "2.4.1",
+      "last_heartbeat": "2026-05-06T14:29:30Z",
+      "region": "us-west"
+    },
+    {
+      "device_id": "warehouse-002",
+      "device_type": "cold_storage_sensor",
+      "cargo_type": "frozen",
+      "status": "connected",
+      "firmware_version": "2.4.0",
+      "last_heartbeat": "2026-05-06T14:28:55Z",
+      "region": "us-central"
+    }
+  ],
+  "count": 5,
+  "data_source": "mock"
+}

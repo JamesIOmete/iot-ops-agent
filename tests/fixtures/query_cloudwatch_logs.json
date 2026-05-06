@@ -1,0 +1,25 @@
+{
+  "status": "Complete",
+  "results": [
+    {
+      "@timestamp": "2026-05-06T14:28:01.342Z",
+      "@message": "{\"level\":\"INFO\",\"deviceId\":\"truck-002\",\"event\":\"telemetry_published\",\"temperature_c\":-11.4,\"seq\":8821}",
+      "level": "INFO"
+    },
+    {
+      "@timestamp": "2026-05-06T14:27:01.108Z",
+      "@message": "{\"level\":\"INFO\",\"deviceId\":\"truck-002\",\"event\":\"telemetry_published\",\"temperature_c\":-11.5,\"seq\":8820}",
+      "level": "INFO"
+    },
+    {
+      "@timestamp": "2026-05-06T14:26:00.991Z",
+      "@message": "{\"level\":\"INFO\",\"deviceId\":\"truck-002\",\"event\":\"telemetry_published\",\"temperature_c\":-11.7,\"seq\":8819}",
+      "level": "INFO"
+    }
+  ],
+  "statistics": {
+    "recordsMatched": 3,
+    "recordsScanned": 180
+  },
+  "data_source": "mock"
+}

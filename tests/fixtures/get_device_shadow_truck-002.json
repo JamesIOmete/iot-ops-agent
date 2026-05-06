@@ -1,0 +1,26 @@
+{
+  "state": {
+    "desired": {
+      "temperature_setpoint_c": -18.0,
+      "reporting_interval_s": 60
+    },
+    "reported": {
+      "temperature_c": -11.2,
+      "connectivity": "connected",
+      "firmware_version": "2.4.1",
+      "reporting_interval_s": 60
+    },
+    "delta": {
+      "temperature_c": -11.2
+    }
+  },
+  "metadata": {
+    "reported": {
+      "temperature_c": {"timestamp": 1746538192},
+      "connectivity": {"timestamp": 1746538192}
+    }
+  },
+  "version": 3881,
+  "timestamp": 1746538192,
+  "data_source": "mock"
+}

@@ -1,0 +1,28 @@
+{
+  "alarms": [
+    {
+      "alarm_name": "ColdChain-TemperatureHigh",
+      "state": "ALARM",
+      "state_reason": "Threshold crossed: 1 datapoint [-11.2 (06/05/26 12:48:00)] was greater than or equal to the threshold (-12.0).",
+      "state_updated": "2026-05-06T12:48:12Z",
+      "metric_name": "MaxTemperatureC",
+      "namespace": "ColdChain/Devices"
+    },
+    {
+      "alarm_name": "ColdChain-DeviceSilence",
+      "state": "ALARM",
+      "state_reason": "Threshold crossed: truck-003 has not published a heartbeat for 47 minutes, exceeding the 30-minute threshold.",
+      "state_updated": "2026-05-06T14:12:17Z",
+      "metric_name": "HeartbeatAgeMinutes",
+      "namespace": "ColdChain/Devices"
+    },
+    {
+      "alarm_name": "ColdChain-DLQDepth",
+      "state": "OK",
+      "state_reason": "Threshold not crossed: 0 messages in DLQ, below threshold of 10.",
+      "state_updated": "2026-05-06T13:00:00Z",
+      "metric_name": "ApproximateNumberOfMessagesVisible",
+      "namespace": "AWS/SQS"
+    }
+  ]
+}
