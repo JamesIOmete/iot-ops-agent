@@ -48,12 +48,33 @@ ANTHROPIC_API_KEY=sk-... python run.py --mode briefing
 
 ## Architecture in Brief
 
-```
-run.py → AgentCore → tool dispatch → AWS (or mock fixtures)
-                ↓
-         reasoning logs (JSONL, incremental)
-                ↓
-         escalation.py → SNS / GitHub (if permitted)
+```mermaid
+flowchart LR
+    run["run.py"] --> core["AgentCore"]
+
+    core --> td["tool dispatch"]
+
+    subgraph aws ["AWS"]
+        dynamo["DynamoDB"]
+        cw["CloudWatch"]
+        cwl["CloudWatch Logs"]
+        sqs["SQS"]
+        shadow["IoT Core Shadow"]
+    end
+
+    td --> dynamo
+    td --> cw
+    td --> cwl
+    td --> sqs
+    td --> shadow
+    td -. "mock mode" .-> fix[("tests/fixtures/")]
+
+    core --> logs[("JSONL logs")]
+    core --> esc["escalation.py"]
+
+    esc --> gate{"--allow-write?"}
+    gate -->|enabled| sns["SNS"]
+    gate -->|enabled| gh["GitHub Issues"]
 ```
 
 The agent loop is a standard tool-use loop: call Claude, dispatch any tool calls, add results to context, repeat until `end_turn`. What makes it production-ready is what surrounds the loop:
@@ -65,6 +86,18 @@ The agent loop is a standard tool-use loop: call Claude, dispatch any tool calls
 - **Mock mode by default** — the agent runs fully without AWS credentials. Fixture data in `tests/fixtures/` tells a coherent story: truck-002 has an active temperature excursion, truck-003 is silent.
 
 See [`docs/architecture.md`](docs/architecture.md) for the full design rationale.
+
+
+## Design Decisions
+
+Bounded tool use: The agent must have explicit, declarative tool registry enforced at dispatch rather than giving the LLM open-ended capability. In production an agent using an inappropriate or unapproved tool can result cause incorrect data changes, unexepcted security, costs, or other customer facing impact.
+
+Escalation: I treat escalation as a designed control path and not as failure handling. An agent should know when confidence, policy, ambiguity, or risk exceeds its authority and produce a clean handoff with structured context. Without that path, production agents can guess, stall, retry blindly, or lose important uncertainty inside generic error handling.
+
+Structured reasoning logs: I log all agent activity as structured JSONL events. Production behavior needs to be inspectable, replayable, searchable, and attributable across decisions, tool calls, costs, errors, and outcomes. Without structured logs, debugging is messy, an incident review becomes guesswork and operational learning can be missed.
+
+Mock mode by default: I ship the agent with mock_mode: true and require an explicit --no-mock flag before it touches live AWS resources. Real-world side effects should require explicit intent, especially in portfolio code, demos, and early development loops. This keeps iteration safe, prevents accidental cloud changes or spend, and signals the production discipline I would expect in a real customer environment.
+
 
 ## Tool Registry
 
