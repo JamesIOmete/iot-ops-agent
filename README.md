@@ -171,7 +171,7 @@ The `data_source` field in every tool result shows `"mock"` or the actual AWS se
 
 ## Related Projects
 
-- **[aws-iot-edge-reference](https://github.com/jward448/aws-iot-edge-reference)** — The AWS IoT stack this agent monitors: Greengrass, IoT Core rules, DynamoDB schema, CloudWatch alarms
-- **[iotctl](https://github.com/jward448/iotctl)** — CLI for fleet management operations (firmware updates, shadow inspection, bulk commands)
-- **[tf-plan-ai-reviewer](https://github.com/jward448/tf-plan-ai-reviewer)** — AI-assisted Terraform plan review for the infrastructure backing this stack
-- **[multicloud-sa-toolkit](https://github.com/jward448/multicloud-sa-toolkit)** — Solutions architect reference patterns across AWS, Azure, and GCP
+- **[aws-iot-edge-reference](https://github.com/JamesIOmete/aws-iot-edge-reference)** — The AWS IoT stack this agent monitors: Greengrass, IoT Core rules, DynamoDB schema, CloudWatch alarms
+- **[iotctl](https://github.com/JamesIOmete/iotctl)** — CLI for fleet management operations (firmware updates, shadow inspection, bulk commands)
+- **[tf-plan-ai-reviewer](https://github.com/JamesIOmete/tf-plan-ai-reviewer)** — AI-assisted Terraform plan review for the infrastructure backing this stack
+- **[multicloud-sa-toolkit](https://github.com/JamesIOmete/multicloud-sa-toolkit)** — Solutions architect reference patterns across AWS, Azure, and GCP
