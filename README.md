@@ -12,7 +12,7 @@ Three operating modes, one agent loop:
 |------|---------|--------------|
 | **Watchdog** | Scheduled (e.g. every 15 min) | Full fleet health check. Checks all devices, all alarms, DLQ depth. Produces structured report. |
 | **Incident** | CloudWatch alarm fires | Executes a YAML runbook. Gathers evidence, forms hypothesis, assesses confidence, remediates or escalates. |
-| **Briefing** | On-demand (ops call, shift handoff) | Concise fleet status for on-call engineer. Prioritised by severity. |
+| **Briefing** | On-demand (ops call, shift handoff) | Concise fleet status for on-call engineer. Prioritized by severity. |
 
 ## Running It
 
@@ -90,7 +90,7 @@ See [`docs/architecture.md`](docs/architecture.md) for the full design rationale
 
 ## Design Decisions
 
-Bounded tool use: The agent must have explicit, declarative tool registry enforced at dispatch rather than giving the LLM open-ended capability. In production an agent using an inappropriate or unapproved tool can result cause incorrect data changes, unexepcted security, costs, or other customer facing impact.
+Bounded tool use: The agent must have explicit, declarative tool registry enforced at dispatch rather than giving the LLM open-ended capability. In production, an agent using an inappropriate or unapproved tool can result in incorrect data changes, unexpected security implications, costs, or other customer-facing impact.
 
 Escalation: I treat escalation as a designed control path and not as failure handling. An agent should know when confidence, policy, ambiguity, or risk exceeds its authority and produce a clean handoff with structured context. Without that path, production agents can guess, stall, retry blindly, or lose important uncertainty inside generic error handling.
 
