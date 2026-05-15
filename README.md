@@ -175,3 +175,5 @@ The `data_source` field in every tool result shows `"mock"` or the actual AWS se
 - **[iotctl](https://github.com/JamesIOmete/iotctl)** — CLI for fleet management operations (firmware updates, shadow inspection, bulk commands)
 - **[tf-plan-ai-reviewer](https://github.com/JamesIOmete/tf-plan-ai-reviewer)** — AI-assisted Terraform plan review for the infrastructure backing this stack
 - **[multicloud-sa-toolkit](https://github.com/JamesIOmete/multicloud-sa-toolkit)** — Solutions architect reference patterns across AWS, Azure, and GCP
+- **[k8s-ai-inference-deployment-demo](https://github.com/JamesIOmete/k8s-ai-inference-deployment-demo)** — Kubernetes deployment patterns for an AI-style inference service; the deployment layer this agent would monitor and operate against
+- **[gpu-rack-anomaly-detection-pytorch](https://github.com/JamesIOmete/gpu-rack-anomaly-detection-pytorch)** — PyTorch anomaly detection pipeline for GPU rack telemetry; produces the structured anomaly reports this agent is designed to consume and act on
